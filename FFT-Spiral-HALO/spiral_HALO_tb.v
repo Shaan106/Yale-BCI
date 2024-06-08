@@ -1,3 +1,5 @@
+
+
 module dft_testbench();
    reg clk, reset, next;
    wire next_out;
@@ -53,26 +55,27 @@ module dft_testbench();
       else counter <= counter+1;
    end
 
+
    initial begin
       @(posedge clk);
       @(posedge clk);
 
       // On the next cycle, begin loading input vector.
       next <= 1;
-      clrCnt <= 1; //clrCnt stands for clear controller
+      clrCnt <= 1;
       @(posedge clk);
       clrCnt <= 0;
       next <= 0;
 
-      // The 64 complex data points enter the system over 16 cycles
-      for (j=0; j < 15; j = j+1) begin
+      // The 1024 complex data points enter the system over 256 cycles
+      for (j=0; j < 255; j = j+1) begin
           // Input: 4 complex words per cycle
          for (k=0; k < 8; k = k+1) begin
             in[k] <= j*8 + k;
          end
          @(posedge clk);
       end
-      j = 15;
+      j = 255;
       for (k=0; k < 8; k = k+1) begin
          in[k] <= j*8 + k;
       end
@@ -80,7 +83,7 @@ module dft_testbench();
 
       @(posedge clk);
       // Wait until the next data vector can be entered
-      while (counter < 14)
+      while (counter < 254)
         @(posedge clk);
 
       // On the next cycle, we will start the next data vector
@@ -91,16 +94,16 @@ module dft_testbench();
       next <= 0;
 
       // Start entering next input vector
-      for (j=0; j < 15; j = j+1) begin
+      for (j=0; j < 255; j = j+1) begin
          // Input 8 words per cycle
          for (k=0; k < 8; k = k+1) begin
-            in[k] <= 128 + j*8 + k;
+            in[k] <= 2048 + j*8 + k;
           end
           @(posedge clk);
        end
-       j = 15;
+       j = 255;
        for (k=0; k < 8; k = k+1) begin
-          in[k] <= 128 + j*8 + k;
+          in[k] <= 2048 + j*8 + k;
        end
    end
 
@@ -129,7 +132,7 @@ module dft_testbench();
       @(posedge clk); #1;
       $display("--- begin output 1---");
 
-      for (m=0; m < 15; m=m+1) begin
+      for (m=0; m < 255; m=m+1) begin
          $display("%x", Y0);
          $display("%x", Y1);
          $display("%x", Y2);
@@ -153,7 +156,7 @@ module dft_testbench();
       @(posedge clk); #1;
       $display("--- begin output 2---");
 
-      for (m=0; m < 15; m=m+1) begin
+      for (m=0; m < 255; m=m+1) begin
          $display("%x", Y0);
          $display("%x", Y1);
          $display("%x", Y2);
