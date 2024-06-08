@@ -8,7 +8,7 @@ based on the information available from the HALO/SCALO papers
 
 - DFT size = 1024 
     - adjustable for different applications
-    - going to implement 1024 epilsepsy for now
+    - going to implement 1024 for now, as that's the upper end for applications mentioned in paper
 
 - ~46 Mbps data rate
 
@@ -21,6 +21,8 @@ based on the information available from the HALO/SCALO papers
 Based on what i learnt from first spiral implementation: [Spiral-1](../FFT-Spiral-1/)
 
 1st implementation had 4 complex words generated per cycle as the input stream, and one transform per 16 cycles with an initial latency of 84 cycles. The DFT size initially was 64. Also assuming 16 bit unsigned integers for the input and output.
+
+- notes about how testbench work, and also how the entire verilog is structure in notebook
 
 ### Given Parameters
 
@@ -51,3 +53,27 @@ Input/output stream: 2 complex words per cycle
 Throughput: one transform every 512 cycles
 Latency: 1373 cycles
 
+this is still a **1.0048 Gbps** data rate, maybe downlocking or even using a less hardware iterative approach is possible?
+
+## Iterative approach
+
+Single stage, iterated over O(log n) times. Slower because has to wait for previous process to finish to begin next. I think it may be better because less hardware which means less dynamic power consumption, as we are still seemingly much above the required data rate.
+
+DFT Size = 1024
+direction = forward
+data type = 16 bit fixed point, unscaled
+architecture = iterative reuse
+radix = 2
+streaming width = 2
+data ordering = natural input / natural output
+BRAM budget = -1
+
+Input/output stream: 2 complex words per cycle
+Throughput: one transform every 5141 cycles
+Latency: 5625 cycles
+
+- 1024 complex points * 32 bits per point = 32768 bits per transform
+- 32768 bits per transform / 5141 cycles per transform = 6.37 bits per cycle
+- 6.37 bits per cycle * 15.7 MHz = 100.1 Mbps
+
+This seems slightly more reasonable, but perhaps further downclocking possible? Actual power consumption is still unknown. Also the iterative approach takes inputs slightly differently, as it's not fully streaming and almost takes inputs in a lump manner.
