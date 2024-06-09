@@ -82,3 +82,9 @@ This seems slightly more reasonable, but perhaps further downclocking possible? 
 # Generated Data tests
 
 In [fully_streaming_visualize](./fully_streaming_visualize/) I decided to alter the testbench first to allow me to visualize the data that was being input, and then being output. I realised that EEG signals wouldn't really have complex values, so I decided to use a real value only input. I kept the complex version just in case.
+
+First I'm going to use a DC signal, as this is trivial to see if the FFT is working correctly - should be a single peak at the DC frequency. The plot of this is shown below (all the stuff is in the sineInput testbench and visualize_fft.py).
+
+![DC Signal FFT](./fully_streaming_visualize/plot_showing_working_DC.png)
+
+Sines are a bit trickier, as an LUT is needed due to verilog not having an inbuilt sine capability.
