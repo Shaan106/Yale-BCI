@@ -39,6 +39,17 @@ module dft_testbench();
       else counter <= counter+1;
    end
 
+   // for later analysis of dft, writing outputs to a file
+    integer outfile;
+    initial begin
+        outfile = $fopen("fft_output.txt", "w");
+        if (outfile == 0) begin
+            $display("Error opening file");
+            $finish;
+        end
+    end
+
+
 
    initial begin
       @(posedge clk);
@@ -57,12 +68,17 @@ module dft_testbench();
          for (k=0; k < 4; k = k+1) begin
             in[k] <= j*4 + k;
          end
+
+         //writing input to visualize
+         $fwrite(outfile, "time: %d input: %x %x %x %x\n", $time, X0, X1, X2, X3);
          @(posedge clk);
       end
       j = 511;
       for (k=0; k < 4; k = k+1) begin
          in[k] <= j*4 + k;
       end
+      // catching final case input to visualize
+      $fwrite(outfile, "time: %d input: %x %x %x %x\n", $time, X0, X1, X2, X3);
 
 
       @(posedge clk);
@@ -117,8 +133,17 @@ module dft_testbench();
          $display("%x", Y1);
          $display("%x", Y2);
          $display("%x", Y3);
+
+         //writing data to analyse
+         $fwrite(outfile, "time: %d output: %x %x %x %x\n", $time, Y0, Y1, Y2, Y3);
+
          @(posedge clk); #1;
       end
+
+      //to catch final case to visualize
+      $fwrite(outfile, "time: %d output: %x %x %x %x\n", $time, Y0, Y1, Y2, Y3);
+
+
       $display("%x", Y0);
       $display("%x", Y1);
       $display("%x", Y2);
@@ -139,6 +164,7 @@ module dft_testbench();
       $display("%x", Y1);
       $display("%x", Y2);
       $display("%x", Y3);
+      $fclose(outfile);
       $finish;
    end
 endmodule

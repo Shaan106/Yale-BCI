@@ -77,3 +77,8 @@ Latency: 5625 cycles
 - 6.37 bits per cycle * 15.7 MHz = 100.1 Mbps
 
 This seems slightly more reasonable, but perhaps further downclocking possible? Actual power consumption is still unknown. Also the iterative approach takes inputs slightly differently, as it's not fully streaming and almost takes inputs in a lump manner.
+
+
+# Generated Data tests
+
+In [fully_streaming_visualize](./fully_streaming_visualize/) I decided to alter the testbench first to allow me to visualize the data that was being input, and then being output. I realised that EEG signals wouldn't really have complex values, so I decided to use a real value only input. I kept the complex version just in case.
