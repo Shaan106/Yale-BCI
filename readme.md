@@ -96,7 +96,15 @@ At this point I think a system for sampling any arbitrary signal so that I can t
 
 I made a quick script that generates samples from your chosen signal: [./Iteration-1/Sampler/sampler.py](./Iteration-1/Sampler/sampler.py)
 
-Then I made 
+Then I made -- going to finish later
+
+to run:
+'''
+python sampler.py
+iverilog -o sampler_out sampler_tb.v sampler.v
+vvp sampler_out
+python sampler_analysis.py
+'''
 
 # Other stuff need to write up
 note: spiral code much more readable than SGen.
