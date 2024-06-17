@@ -42,10 +42,10 @@ This is mostly from reading the [SCALO paper](https://mckarthik7.github.io/pdfs/
 - Data type
     - fixed point
     - need to check about interleaver, but going with upper bound of 32 bit for now
-![Data types](./Images/data_types.png)
+    - <img src="./Images/data_types.png" width="400">
 
 - Algorithm description
-![Alg Desc](./Images/FFT_desc.png)
+    - <img src="./Images/FFT_desc.png" width="400">
 
 ## 2. Iteration 1
 
@@ -90,9 +90,53 @@ For an initial example I went for the most basic input signal that I knew the ou
 
 ![Spiral Output](./Images/iteration_1/const_signal.png)
 
+### Sampler Interlude
 
+At this point I think a system for sampling any arbitrary signal so that I can test the FFT PE (in a way that works with verilog) is necessary. This is slightly tricky as verilog is not very good with signals or sampling (ie using a sine wave as an input would require me to create an LUT which seems unecessary).
 
-# Other 
+I made a quick script that generates samples from your chosen signal: [./Iteration-1/Sampler/sampler.py](./Iteration-1/Sampler/sampler.py)
+
+Then I made 
+
+# Other stuff need to write up
 note: spiral code much more readable than SGen.
 
+- noise filtering
+
+- the fft is so so sensitive, show example of adding some 0s to start of input.
+
+- generalised testbench
+
+- noise reduction
+
+- input data clipping
+
+- talk about sampler
+
 also add other learning resources
+
+Also look at prev analysis doc: [Old analysis doc](./FFT-Spiral-HALO/readme.md)
+
+- one of the interesting takeaways:
+
+    """ <br>
+    *Started with changing to 1024 DFT size, keeping making I/O stream 2 complex words per cycle, to reduce dynamic power consumption (at cost of speed, as it seems like data throughput is not a bottleneck here, but power might end up being).*
+
+    *DFT Size = 1024 <br>*
+    *Direction = forward <br>*
+    *Data type = 16 bit fixed point, unscaled <br>*
+    *Architecture = fully streaming <br>*
+    *Radix = 2 <br>*
+    *Streaming width = 2 <br>*
+    *Data ordering = natural input / natural output <br>*
+    *BRAM budget = -1*
+
+    *Input/output stream: 2 complex words per cycle* <br>
+    *Throughput: one transform every 512 cycles* <br>
+    *Latency: 1373 cycles*
+
+    *this is still a **1.0048 Gbps** data rate, maybe downlocking or even using a less hardware iterative approach is possible?* <br>
+    """
+
+- will need to use grace cluster to check power consumption properly.
+

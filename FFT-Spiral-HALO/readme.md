@@ -40,13 +40,13 @@ Based on what i learnt from first spiral implementation: [Spiral-1](../FFT-Spira
 
 Started with changing to 1024 DFT size, keeping making I/O stream 2 complex words per cycle, to reduce dynamic power consumption (at cost of speed, as it seems like data throughput is not a bottleneck here, but power might end up being).
 
-DFT Size = 1024
-direction = forward
-data type = 16 bit fixed point, unscaled
-architecture = fully streaming
-radix = 2
-streaming width = 2
-data ordering = natural input / natural output
+DFT Size = 1024 <br>
+Direction = forward <br>
+Data type = 16 bit fixed point, unscaled <br>
+Architecture = fully streaming <br>
+Radix = 2 <br>
+Streaming width = 2 <br>
+Data ordering = natural input / natural output <br>
 BRAM budget = -1
 
 Input/output stream: 2 complex words per cycle

@@ -150,7 +150,7 @@ module dft_testbench();
    // for later analysis of dft, writing outputs to a file
     integer outfile;
     initial begin
-        outfile = $fopen("./output_files/fft_out_step.txt", "w");
+        outfile = $fopen("./output_files/fft_out_sine.txt", "w");
         if (outfile == 0) begin
             $display("Error opening file");
             $finish;
@@ -159,17 +159,45 @@ module dft_testbench();
 
     integer infile;
     initial begin
-        infile = $fopen("./output_files/fft_in_step.txt", "w");
+        infile = $fopen("./output_files/fft_in_sine.txt", "w");
         if (outfile == 0) begin
             $display("Error opening file");
             $finish;
         end
     end
 
-   // reg [63:0] index;
+   // array to hold sampled input
+   reg [31:0] sampled_signal_array [0:1023];
 
-   // reg [15:0] inputIndex;
-   // reg [15:0] outputIndex;
+   integer sampled_file;
+   integer line;
+   integer scan_file;
+
+   // Read hexadecimal data into sampled_signal_array
+   initial begin
+      sampled_file = $fopen("./input_signals/sine.txt", "r");
+      if (sampled_file == 0) begin
+         $display("Error opening file");
+         $finish;
+      end
+
+      for (line = 0; line < 1024; line = line + 1) begin
+         scan_file = $fscanf(sampled_file, "%x\n", sampled_signal_array[line]);
+         if (scan_file != 1) begin
+               $display("Error reading data at index %0d", line);
+               $finish;
+         end
+      end
+
+      $fclose(sampled_file);
+
+      // disp for checking
+      // for (i = 0; i < 1024; i = i + 1) begin
+      //    $display("sampled_signal_array[%0d] = %d", i, sampled_signal_array[i]);
+      // end
+
+      $display("data read done");
+   end
    // ----------------------------------------------------------
 
 
@@ -186,31 +214,23 @@ module dft_testbench();
 
       // The 1024 complex data points enter the system over 256 cycles
       for (j=0; j < 255; j = j+1) begin
+
+         // ------------------------- custom -------------------------
+
          // Input: 4 complex words per cycle
-         
          // if k is even, real part of input, then it exists
          for (k=0; k < 8; k = k+2) begin
             // in[k] <= j*8 + k;
-            in[k] <= 100;
+            in[k] <= sampled_signal_array[j*4 + k/2];
          end
-
          // if k is odd, imaginary part of input, then it is 0
          for (k=1; k < 8; k = k+2) begin
             in[k] <= 0;
          end
-
-         // ------------------------- custom -------------------------
-         // in[0] <= 10; // j*4 + 0
-         // in[1] <= 0;
-         // in[2] <= 10;
-         // in[3] <= 0;
-         // in[4] <= 10;
-         // in[5] <= 0;
-         // in[6] <= 10;
-         // in[7] <= 0;
-
-         // $fwrite(outfile, "time: %d index: %d input: %d %d %d %d %d %d %d %d\n", $time, j, X0, X1, X2, X3, X4, X5, X6, X7);
-
+         // end
+         
+      
+  
          // time is time
          // input_set is which set of inputs it is part of (ie which set of inputs went into fft PE together)
          // index is 1-to-1 which input after which
@@ -219,6 +239,7 @@ module dft_testbench();
 
          for (l=0; l < 8; l = l+2) begin
             $fwrite(infile, "time: %d input_set: %d index: %d in_r: %d in_i: %d\n", $time, j, j*4 + l/2, in[l], in[l+1]);
+            // $display("time: %d input_set: %d index: %d in_r: %d in_i: %d\n", $time, j, j*4 + l/2, in[l], in[l+1]);
          end
 
          // X0 is bound to in[0] etc
@@ -231,7 +252,8 @@ module dft_testbench();
       // if k is even, real part of input, then it exists
       for (k=0; k < 8; k = k+2) begin
          //in[k] <= j*8 + k;
-         in[k] <= 100;
+         // in[k] <= 100;
+         in[k] <= sampled_signal_array[j*4 + k/2];
       end
 
       // if k is odd, imaginary part of input, then it is 0

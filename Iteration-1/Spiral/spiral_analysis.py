@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-input_file = './output_files/fft_in_v3.txt'
-output_file = './output_files/fft_out_v3.txt'
+input_file = './output_files/fft_in_sine.txt'
+output_file = './output_files/fft_out_sine.txt'
 
 # ------------------------------ INPUT PLOT ------------------------------
 # Read the data from the file
@@ -53,6 +53,10 @@ with open(output_file, 'r') as file:
             # magnitude is what is plot on the frequency plot.
             # magnitude = (in_r ** 2 + in_i ** 2) ** 0.5
             magnitude = np.abs(in_r + 1j * in_i)
+
+            # lots of noise, so filter
+            #if ((magnitude > 4294960000)):
+             #   continue
             data.append((index, magnitude))
 
 # Extract the x and y values
@@ -64,5 +68,5 @@ plt.figure(figsize=(12, 6))
 plt.plot(x, y)
 plt.xlabel('Index')
 plt.ylabel('Magnitude of Freq')
-plt.title('Output Frequency Spectrum')
+plt.title('Unfiltered FFT PE Frequency Spectrum')
 plt.show()
