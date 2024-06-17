@@ -94,7 +94,7 @@ For an initial example I went for the most basic input signal that I knew the ou
 
 At this point I think a system for sampling any arbitrary signal so that I can test the FFT PE (in a way that works with verilog) is necessary. This is slightly tricky as verilog is not very good with signals or sampling (ie using a sine wave as an input would require me to create an LUT which seems unecessary).
 
-I made a quick script that generates samples from your chosen signal: [./Iteration-1/Sampler/sampler.py](./Iteration-1/Sampler/sampler.py)
+I made a quick script that generates samples from your chosen signal: [./Iteration-1/Spiral/sampler.py](./Iteration-1/Spiral/sampler.py)
 
 Then I made -- going to finish later
 
