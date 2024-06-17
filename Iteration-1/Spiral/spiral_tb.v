@@ -111,6 +111,18 @@ module dft_testbench();
    assign X6 = in[6];
    assign X7 = in[7];
 
+   // ------------------------- custom -------------------------
+   wire [31:0] out [7:0];
+   assign out[0] = Y0;
+   assign out[1] = Y1;
+   assign out[2] = Y2;
+   assign out[3] = Y3;
+   assign out[4] = Y4;
+   assign out[5] = Y5;
+   assign out[6] = Y6;
+   assign out[7] = Y7;
+   // ----------------------------------------------------------
+
    initial clk = 0;
 
    always #10000 clk = ~clk;
@@ -134,6 +146,32 @@ module dft_testbench();
       else counter <= counter+1;
    end
 
+   // ------------------------- custom -------------------------
+   // for later analysis of dft, writing outputs to a file
+    integer outfile;
+    initial begin
+        outfile = $fopen("./output_files/fft_out_v3.txt", "w");
+        if (outfile == 0) begin
+            $display("Error opening file");
+            $finish;
+        end
+    end
+
+    integer infile;
+    initial begin
+        infile = $fopen("./output_files/fft_in_v3.txt", "w");
+        if (outfile == 0) begin
+            $display("Error opening file");
+            $finish;
+        end
+    end
+
+   // reg [63:0] index;
+
+   // reg [15:0] inputIndex;
+   // reg [15:0] outputIndex;
+   // ----------------------------------------------------------
+
 
    initial begin
       @(posedge clk);
@@ -148,17 +186,74 @@ module dft_testbench();
 
       // The 1024 complex data points enter the system over 256 cycles
       for (j=0; j < 255; j = j+1) begin
-          // Input: 4 complex words per cycle
-         for (k=0; k < 8; k = k+1) begin
-            in[k] <= j*8 + k;
+         // Input: 4 complex words per cycle
+         
+         // if k is even, real part of input, then it exists
+         for (k=0; k < 8; k = k+2) begin
+            // in[k] <= j*8 + k;
+            in[k] <= 100;
          end
+
+         // if k is odd, imaginary part of input, then it is 0
+         for (k=1; k < 8; k = k+2) begin
+            in[k] <= 0;
+         end
+
+         // ------------------------- custom -------------------------
+         // in[0] <= 10; // j*4 + 0
+         // in[1] <= 0;
+         // in[2] <= 10;
+         // in[3] <= 0;
+         // in[4] <= 10;
+         // in[5] <= 0;
+         // in[6] <= 10;
+         // in[7] <= 0;
+
+         // $fwrite(outfile, "time: %d index: %d input: %d %d %d %d %d %d %d %d\n", $time, j, X0, X1, X2, X3, X4, X5, X6, X7);
+
+         // time is time
+         // input_set is which set of inputs it is part of (ie which set of inputs went into fft PE together)
+         // index is 1-to-1 which input after which
+         // input is the input into the fft PE of form (real part, imaginary part)
+         // $fwrite(outfile, "time: %d input_set: %d index: %d input: %d %d %d %d %d %d %d %d\n", $time, j, j, X0, X1, X2, X3, X4, X5, X6, X7);
+
+         for (l=0; l < 8; l = l+2) begin
+            $fwrite(infile, "time: %d input_set: %d index: %d in_r: %d in_i: %d\n", $time, j, j*4 + l/2, in[l], in[l+1]);
+         end
+
+         // X0 is bound to in[0] etc
+         // ----------------------------------------------------------
+
          @(posedge clk);
       end
       j = 255;
-      for (k=0; k < 8; k = k+1) begin
-         in[k] <= j*8 + k;
+
+      // if k is even, real part of input, then it exists
+      for (k=0; k < 8; k = k+2) begin
+         //in[k] <= j*8 + k;
+         in[k] <= 100;
       end
 
+      // if k is odd, imaginary part of input, then it is 0
+      for (k=1; k < 8; k = k+2) begin
+         in[k] <= 0;
+      end
+
+      // ------------------------- custom -------------------------
+      // in[0] <= 10; // j*4 + 0
+      // in[1] <= 0;
+      // in[2] <= 10;
+      // in[3] <= 0;
+      // in[4] <= 10;
+      // in[5] <= 0;
+      // in[6] <= 10;
+      // in[7] <= 0;
+
+      // catching final case input to visualize
+      for (l=0; l < 8; l = l+2) begin
+         $fwrite(infile, "time: %d input_set: %d index: %d in_r: %d in_i: %d\n", $time, j, j*4 + l/2, in[l], in[l+1]);
+      end
+      // ----------------------------------------------------------
 
       @(posedge clk);
       // Wait until the next data vector can be entered
@@ -212,48 +307,69 @@ module dft_testbench();
       $display("--- begin output 1---");
 
       for (m=0; m < 255; m=m+1) begin
-         $display("%x", Y0);
-         $display("%x", Y1);
-         $display("%x", Y2);
-         $display("%x", Y3);
-         $display("%x", Y4);
-         $display("%x", Y5);
-         $display("%x", Y6);
-         $display("%x", Y7);
+         // $display("%x", Y0);
+         // $display("%x", Y1);
+         // $display("%x", Y2);
+         // $display("%x", Y3);
+         // $display("%x", Y4);
+         // $display("%x", Y5);
+         // $display("%x", Y6);
+         // $display("%x", Y7);
+
+         // ------------------------- custom -------------------------
+
+         //output
+         // $fwrite(outfile, "time: %d index: %d output: %d %d %d %d %d %d %d %d\n", $time, m, Y0, Y1, Y2, Y3, Y4, Y5, Y6, Y7);
+         for (l=0; l < 8; l = l+2) begin
+            $fwrite(outfile, "time: %d input_set: %d index: %d out_r: %d out_i: %d\n", $time, m, m*4 + l/2, out[l], out[l+1]);
+         end
+         // ----------------------------------------------------------
+
          @(posedge clk); #1;
       end
-      $display("%x", Y0);
-      $display("%x", Y1);
-      $display("%x", Y2);
-      $display("%x", Y3);
-      $display("%x", Y4);
-      $display("%x", Y5);
-      $display("%x", Y6);
-      $display("%x", Y7);
+      // $display("%x", Y0);
+      // $display("%x", Y1);
+      // $display("%x", Y2);
+      // $display("%x", Y3);
+      // $display("%x", Y4);
+      // $display("%x", Y5);
+      // $display("%x", Y6);
+      // $display("%x", Y7);
+
+      // ------------------------- custom -------------------------
+
+      //catching final case, m=255
+      // $fwrite(outfile, "time: %d index: %d output: %d %d %d %d %d %d %d %d\n", $time, 255, Y0, Y1, Y2, Y3, Y4, Y5, Y6, Y7);
+      for (l=0; l < 8; l = l+2) begin
+         $fwrite(outfile, "time: %d input_set: %d index: %d out_r: %d out_i: %d\n", $time, 255, 255*4 + l/2, out[l], out[l+1]);
+      end
+
+      // ----------------------------------------------------------
+
       // Wait until next_out goes high, then wait one clock cycle and begin receiving data
       @(posedge next_out);
       @(posedge clk); #1;
       $display("--- begin output 2---");
 
       for (m=0; m < 255; m=m+1) begin
-         $display("%x", Y0);
-         $display("%x", Y1);
-         $display("%x", Y2);
-         $display("%x", Y3);
-         $display("%x", Y4);
-         $display("%x", Y5);
-         $display("%x", Y6);
-         $display("%x", Y7);
+         // $display("%x", Y0);
+         // $display("%x", Y1);
+         // $display("%x", Y2);
+         // $display("%x", Y3);
+         // $display("%x", Y4);
+         // $display("%x", Y5);
+         // $display("%x", Y6);
+         // $display("%x", Y7);
          @(posedge clk); #1;
       end
-      $display("%x", Y0);
-      $display("%x", Y1);
-      $display("%x", Y2);
-      $display("%x", Y3);
-      $display("%x", Y4);
-      $display("%x", Y5);
-      $display("%x", Y6);
-      $display("%x", Y7);
+      // $display("%x", Y0);
+      // $display("%x", Y1);
+      // $display("%x", Y2);
+      // $display("%x", Y3);
+      // $display("%x", Y4);
+      // $display("%x", Y5);
+      // $display("%x", Y6);
+      // $display("%x", Y7);
       $finish;
    end
 endmodule

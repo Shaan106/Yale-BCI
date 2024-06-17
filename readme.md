@@ -70,15 +70,29 @@ Output:
 
 Verilog files, slightly altered so that I can test them easier: [./Iteration-1/Spiral/](./Iteration-1/Spiral/)
 
-### Spiral Analysis/Testing
+### Spiral Testbench
 
-Using iverilog to compile and run the testbench:
+I have created a custom testbench for the spiral generated FFT which allows me to alter the input for testing ([./Iteration-1/Spiral/spiral_tb.v](./Iteration-1/Spiral/spiral_tb.v)).
+
+Use iverilog to compile the testbench:
 
 `iverilog -o spiral_out spiral_tb.v spiral_fft.v`
 
-Then running using vvp:
+Then run using vvp:
 
 `vvp spiral_out`
 
+### Spiral Analysis
+
+I also created a python script to analyze the dumped output from the testbench ([./Iteration-1/Spiral/spiral_analysis.py](./Iteration-1/Spiral/spiral_analysis.py)).
+
+For an initial example I went for the most basic input signal that I knew the output frequency spectrum for. I created a signal of constant value, and the output for that should be a single peak at DC frequency (ie index = 0). And the output was as expected, shown below.
+
+![Spiral Output](./Images/iteration_1/const_signal.png)
 
 
+
+# Other 
+note: spiral code much more readable than SGen.
+
+also add other learning resources
