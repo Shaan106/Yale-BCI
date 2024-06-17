@@ -99,12 +99,12 @@ I made a quick script that generates samples from your chosen signal: [./Iterati
 Then I made -- going to finish later
 
 to run:
-'''
+```
 python sampler.py
 iverilog -o sampler_out sampler_tb.v sampler.v
 vvp sampler_out
 python sampler_analysis.py
-'''
+```
 
 # Other stuff need to write up
 note: spiral code much more readable than SGen.
