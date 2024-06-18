@@ -2,7 +2,7 @@
 
 I am going to try to keep track of decisions made and why here.
 
-## 1. Problem Analysis
+## I. Problem Analysis
 
 ### Choosing a FFT hardware generator
 
@@ -47,9 +47,10 @@ This is mostly from reading the [SCALO paper](https://mckarthik7.github.io/pdfs/
 - Algorithm description
     - <img src="./Images/FFT_desc.png" width="400">
 
-## 2. Iteration 1
 
-### Spiral Generation
+## II. FFT PE Generation
+
+### Parameters
 - **Transform Size**: 1024 (adjustable for different applications, but start with 1024)
 - **Direction**: Forward
 - **Data Type**: Fixed Point
@@ -90,21 +91,66 @@ For an initial example I went for the most basic input signal that I knew the ou
 
 ![Spiral Output](./Images/iteration_1/const_signal.png)
 
-### Sampler Interlude
+## III. Generalization Interlude
+
+### Sampler
 
 At this point I think a system for sampling any arbitrary signal so that I can test the FFT PE (in a way that works with verilog) is necessary. This is slightly tricky as verilog is not very good with signals or sampling (ie using a sine wave as an input would require me to create an LUT which seems unecessary).
 
-I made a quick script that generates samples from your chosen signal: [./Iteration-1/Spiral/sampler.py](./Iteration-1/Spiral/sampler.py)
+I made a quick script that generates samples from your chosen signal: [./Iteration-1/Spiral/sampler.py](./Iteration-1/Spiral/sampler.py). The script samples the specified signal, then further scales it so that it is of a reasonable size in the 32-bit fixed point representation.
 
-Then I made -- going to finish later
+The first signal I decided to sample was a sine wave, and the output from the sampler.py script is shown below.
+
+*Note: the function being sampled is $sin(x) + 1$ to ensure all values ≥ 0*
+
+![Sine Wave](./Images/iteration_1/sampled-input.png).
+
+The script also shows the ideal output of an FFT applied to the signal. An example of a sine wave's FFT output is shown below.
+
+![Sine Wave FFT](./Images/iteration_1/expected-spectrum.png)
+
+### Generalized Testbench
+
+[./Iteration-1/Spiral/spiral_tb_general.v](./Iteration-1/Spiral/spiral_tb_general.v) is the generalised testbench for any sampled input. There are a lot of intermediary text files that are read/written to, and I will later make all of that automated as well. 
+
+The output of the testbench is written in a custom format, and then analysed using the spiral analysis script.
+
+### Analysis of FFT Output
+
+To analyse the outputs, I made  a python script provides graphs that show the input into the FFT PE, as well as the output frequency spectrum. The unaltered output from the FFT PE seems to suffer from a lot of noise, I think mostly caused by over/underflows. So, I created a filter to remove the likely noise-impacted data and got a reasonable output. This filter could likely use some fine tuning to get the best possible result - perhaps this is even irrelevant for brain signal processing.
+
+Example unfiltered and filtered outputs:
+
+![Unfiltered Output](./Images/iteration_1/unfiltered-output.png)
+
+![Filtered Output](./Images/iteration_1/filtered-output.png)
+
+*this needs a bit more work*
+
+### How to run
+
+To do the steps above, run the following commands, making sure that you change the function being sampled/directories if needed.
+
+Currently it will sample $sin(x) + 1$ and run the FFT on that. If you change the `sample_func(x)` in [./Iteration-1/Spiral/sampler.py](./Iteration-1/Spiral/sampler.py) to another function, you can sample that instead, no changing of directories needed. You may want to change the filter cutoffs.
+
 
 to run:
 ```
-python sampler.py
-iverilog -o sampler_out sampler_tb.v sampler.v
-vvp sampler_out
-python sampler_analysis.py
+cd ./Iteration-1/Spiral/
 ```
+Then
+```
+python sampler.py
+iverilog -o spiral_out spiralr_tb_general.v spiral_fft.v
+vvp spiral_out
+python spiral_analysis.py
+```
+
+Can also run using the bash script:
+```
+./run_simulation.sh
+```
+
 
 # Other stuff need to write up
 note: spiral code much more readable than SGen.
@@ -143,7 +189,7 @@ Also look at prev analysis doc: [Old analysis doc](./FFT-Spiral-HALO/readme.md)
     *Throughput: one transform every 512 cycles* <br>
     *Latency: 1373 cycles*
 
-    *this is still a **1.0048 Gbps** data rate, maybe downlocking or even using a less hardware iterative approach is possible?* <br>
+    *this is still a **1.0048 Gbps** data rate, maybe downlocking or even using less hardware, iterative approach is possible?* <br>
     """
 
 - will need to use grace cluster to check power consumption properly.
